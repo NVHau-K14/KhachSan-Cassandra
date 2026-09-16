@@ -1,0 +1,108 @@
+﻿@page "{id?}"
+@model HotelDetailsModel
+@{
+    ViewData["Title"] = Model.Hotel.Name;
+}
+
+<div class="container mt-4 mb-5">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-primary-custom">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/Index?SelectedPoi=@System.Net.WebUtility.UrlEncode(Model.Hotel.PoiName)" class="text-decoration-none text-primary-custom">@Model.Hotel.PoiName</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Hotel.Name</li>
+        </ol>
+    </nav>
+
+    <!-- Khung thông tin khách sạn -->
+    <div class="search-card p-4 mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="@Model.Hotel.ImageUrl" class="img-fluid rounded shadow-sm" alt="@Model.Hotel.Name" style="width: 100%; height: 320px; object-fit: cover;">
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h2 class="fw-bold mb-1">@Model.Hotel.Name</h2>
+                    <span class="badge bg-primary fs-6"><i class="bi bi-star-fill text-warning"></i> 9.0</span>
+                </div>
+
+                <!-- Hiển thị vị trí gần POI nào -->
+                <div class="my-2">
+                    <span class="badge bg-info bg-opacity-25 text-primary border border-info px-3 py-2 rounded-pill">
+                        <i class="bi bi-geo-alt-fill text-danger"></i> Nằm tại khu vực: <strong>@Model.Hotel.PoiName</strong>
+                    </span>
+                </div>
+
+                <p class="text-muted mt-2 mb-1"><i class="bi bi-map text-secondary"></i> @Model.Hotel.FullAddress</p>
+                <p class="text-secondary mb-3"><i class="bi bi-telephone-fill text-success"></i> Liên hệ: <strong>@Model.Hotel.Phone</strong></p>
+
+                <hr />
+
+                <div class="mb-3">
+                    <h6 class="fw-bold text-dark">Tiện nghi có sẵn:</h6>
+                    <span class="badge bg-light text-dark border me-1"><i class="bi bi-wifi"></i> Wifi miễn phí</span>
+                    <span class="badge bg-light text-dark border me-1"><i class="bi bi-cup-hot"></i> Bữa sáng</span>
+                    <span class="badge bg-light text-dark border"><i class="bi bi-water"></i> Hồ bơi ngoài trời</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng phòng trống theo ngày (Q4 & Q3) -->
+    <div class="search-card p-4">
+        <h4 class="fw-bold mb-3">Tình trạng phòng</h4>
+
+        <form method="get" class="d-flex gap-3 mb-4 p-3 bg-light rounded border align-items-center">
+            <input type="hidden" name="id" value="@Model.Hotel.Id" />
+            <label class="fw-bold small text-muted">Chọn ngày kiểm tra:</label>
+            <div class="input-group" style="max-width: 250px;">
+                <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                <input type="date" name="CheckDate" class="form-control" value="@Model.CheckDate">
+            </div>
+            <button type="submit" class="btn btn-primary-custom">Kiểm tra phòng trống</button>
+        </form>
+
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Số Phòng</th>
+                    <th>Sức chứa</th>
+                    <th>Giá / Đêm</th>
+                    <th>Tình trạng ngày (@Model.CheckDate)</th>
+                    <th style="width: 150px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var room in Model.Rooms)
+                {
+                    <tr>
+                        <td>
+                            <strong class="text-primary-custom fs-5">Phòng @room.RoomNumber</strong>
+                        </td>
+                        <td><i class="bi bi-people-fill"></i> @room.Capacity người</td>
+                        <td class="text-danger fw-bold fs-5">@room.Price.ToString("N0") VND</td>
+                        <td>
+                            @if (room.IsAvailable)
+                            {
+                                <span class="badge bg-success">Còn phòng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Đã kín phòng</span>
+                            }
+                        </td>
+                        <td>
+                            @if (room.IsAvailable)
+                            {
+                                <button class="btn btn-primary-custom w-100">Đặt ngay</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-outline-secondary w-100" disabled>Hết phòng</button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
